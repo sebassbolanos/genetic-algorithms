@@ -1,5 +1,5 @@
 import random
-from selection import roulette_selection, ranking_selection, tournament_selection
+from core.selection import roulette_selection, ranking_selection, tournament_selection
 from crossover import one_point_crossover, two_point_crossover, uniform_crossover
 from mutation import bit_flip_mutation, swap_mutation
 
