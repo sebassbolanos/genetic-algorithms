@@ -1,9 +1,11 @@
 import random
-from core.selection import roulette_selection, ranking_selection, tournament_selection
+import sys
+import os
+sys.path.insert(0, os.path.dirname(__file__))
+
+from selection import roulette_selection, ranking_selection, tournament_selection
 from crossover import one_point_crossover, two_point_crossover, uniform_crossover
 from mutation import bit_flip_mutation, swap_mutation
-
-
 class GeneticAlgorithm:
     """
     A modular Genetic Algorithm framework.
