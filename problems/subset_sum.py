@@ -118,9 +118,53 @@ def subset_sum_ga(
 
     return selected_numbers, achieved_sum, target, history
 
+# PUNTO EXTRA: DP BOTTOM-UP (iterativo)
+
+
+def subset_sum_dp_bottom_up(numbers: list[int], target: int) -> tuple[bool, list[int]]:
+    """
+    Solves Subset Sum using bottom-up Dynamic Programming (tabular/iterative).
+    
+    Builds a 2D boolean table where dp[i][s] = True means it is possible
+    to reach sum s using the first i elements. Avoids recursion entirely,
+     eliminating Python's recursion limit risk.
+    Time complexity: O(n * target). Space complexity: O(n * target).
+
+    Args:
+        numbers: list of integers.
+        target:  target sum to reach.
+
+    Returns:
+        (found, subset) where found is True if a valid subset exists,
+        and subset is the list of elements that sum to target (empty if not found).
+    """
+    n = len(numbers)
+    # dp[i][s] = True si se puede llegar a suma s con los primeros i elementos
+    dp = [[False] * (target + 1) for _ in range(n + 1)]
+    dp[0][0] = True  # suma 0 siempre es posible con 0 elementos
+
+    for i in range(1, n + 1):
+        for s in range(target + 1):
+            # Opción 1: no incluir numbers[i-1]
+            dp[i][s] = dp[i - 1][s]
+            # Opción 2: incluir numbers[i-1] si cabe
+            if s >= numbers[i - 1]:
+                dp[i][s] = dp[i][s] or dp[i - 1][s - numbers[i - 1]]
+
+    if not dp[n][target]:
+        return False, []
+
+    # Reconstruir cuáles elementos se incluyeron
+    subset = []
+    s = target
+    for i in range(n, 0, -1):
+        if dp[i][s] and not dp[i - 1][s]:
+            subset.append(numbers[i - 1])
+            s -= numbers[i - 1]
+
+    return True, subset
 
 # QUICK TEST
-
 
 if __name__ == "__main__":
     numbers = [3, 7, 1, 8, 5, 12, 4, 9]
@@ -141,3 +185,6 @@ if __name__ == "__main__":
     exact = achieved == tgt
     print(f"[GA]         Exact: {exact}  |  Subset: {selected}  |  Sum: {achieved}  |  Target: {tgt}")
     print(f"             Generations run: {len(history)}")
+
+    found, subset = subset_sum_dp_bottom_up(numbers, target)
+    print(f"[DP Bottom-Up] Found: {found}  |  Subset: {subset}  |  Sum: {sum(subset)}")

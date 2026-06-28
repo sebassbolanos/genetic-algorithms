@@ -136,6 +136,59 @@ def partition_ga(
     return subset_a, subset_b, difference, history
 
 
+# PUNTO EXTRA: DP BOTTOM-UP (iterativo)
+
+
+def partition_dp_bottom_up(numbers: list[int]) -> tuple[bool, list[int], list[int]]:
+    """
+    Solves the Partition Problem using bottom-up Dynamic Programming (tabular/iterative).
+    
+    Reduces to Subset Sum bottom-up: checks if any subset sums to total // 2.
+    Builds a 2D boolean table iteratively, avoiding recursion entirely.
+    Time complexity: O(n * total/2). Space complexity: O(n * total/2).
+
+    Args:
+        numbers: list of integers.
+
+    Returns:
+        (found, subset_a, subset_b) where found is True if a valid partition
+        exists, and subset_a / subset_b are the two groups (empty lists if not found).
+    """
+    total = sum(numbers)
+    if total % 2 != 0:
+        return False, [], []
+
+    target = total // 2
+    n = len(numbers)
+
+    # dp[i][s] = True si se puede llegar a suma s con los primeros i elementos
+    dp = [[False] * (target + 1) for _ in range(n + 1)]
+    dp[0][0] = True
+
+    for i in range(1, n + 1):
+        for s in range(target + 1):
+            dp[i][s] = dp[i - 1][s]
+            if s >= numbers[i - 1]:
+                dp[i][s] = dp[i][s] or dp[i - 1][s - numbers[i - 1]]
+
+    if not dp[n][target]:
+        return False, [], []
+
+    # Reconstruir subset_a
+    subset_a = []
+    s = target
+    for i in range(n, 0, -1):
+        if dp[i][s] and not dp[i - 1][s]:
+            subset_a.append(numbers[i - 1])
+            s -= numbers[i - 1]
+
+    subset_b = numbers[:]
+    for elem in subset_a:
+        subset_b.remove(elem)
+
+    return True, subset_a, subset_b
+
+
 
 # QUICK TEST
 
@@ -162,3 +215,10 @@ if __name__ == "__main__":
     print(f"[GA]         Difference: {diff}")
     print(f"             A={a} sum={sum(a)}  |  B={b} sum={sum(b)}")
     print(f"             Generations run: {len(history)}")
+
+    found, a, b = partition_dp_bottom_up(numbers)
+print(f"[DP Bottom-Up] Found: {found}")
+if found:
+    print(f"               A={a} sum={sum(a)}  |  B={b} sum={sum(b)}")
+
+    
